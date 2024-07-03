@@ -1,2 +1,2 @@
 # tetris-logic
-Desafio confeccionado juntamente aos meus colegas de classe. O objetivo era definir o funcionamento lógico do jogo Tetris, por meio de funções. Implementado na linguagem C.
+Desafio confeccionado por meio da linguagem C, juntamente com meus colegas de classe do curso de Análise e Desenvolvimento de Sistemas. O objetivo é definir o funcionamento lógico do jogo Tetris.
