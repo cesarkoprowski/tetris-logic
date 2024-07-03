@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv='content-type' content='text/html; charset=utf-8'>
+    <title>Desafio 2</title>        <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link href='https://fonts.googleapis.com/css?family=Noto+Sans:400,700,400italic' rel='stylesheet' type='text/css'>
+    <link rel='stylesheet' href='https://sindresorhus.com/github-markdown-css/github-markdown.css'>
+    <style>
+        .markdown-body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+        font-family: 'Noto Sans', sans-serif;
+        }
+        .markdown-body h6 { margin-bottom: 0; }
+        .markdown-body h6 + ul li {
+        display: inline-block;
+        width: 100%;
+        max-width: 426px;
+        vertical-align: top;
+        }
+    </style>
+</head>
+<body>
+    <article class='markdown-body'>
+
+<h3>Laboratório de L.P.</h3>
+
+<h1>Desafio 2 - Tetris</h1>
+
+<p><em>Professor:</em> Alexandre Mello Ferreira</p>
+<em>e-mail: </em><a href="mailto:alexandre.ferreira16@fatec.sp.gov.br?Subject=FatecCampinas%20Lab2" target="_top">alexandre.ferreira16@fatec.sp.gov.br</a><br>
+
+<hr>
+
+<h2>
+<a id="user-content-descrição" class="anchor" href="#descri%C3%A7%C3%A3o" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Descrição</h2>
+
+<p>Tetris é um conhecido jogo de encaixe de blocos. O jogo ocorre em um tabuleiro com largura e altura fixas. Usaremos o primeiro quadrante do plano para representar o tabuleiro, onde no eixo <code>x</code> temos a base do tabuleiro e no eixo <code>y</code> temos as laterais do mesmo. O canto inferior esquerdo do tabuleiro está sob o ponto <code>(0,0)</code> (veja a Figura 0). A cada instante um bloco corrente cai do topo do tabuleiro em direção à base, e o jogador deve posicionar este bloco sobre outras peças ou sobre a base do tabuleiro. Dois blocos não podem se sobrepor, logo, durante a descida de um bloco, ele irá parar sobre o bloco mais alto que encostar em alguma parte da sua base. Para representar o tabuleiro iremos utilizar uma matriz <code>10 x 10</code>, onde as coordenadas de cada bloco estão de acordo com a Figura 1.   </p>
+
+<p><a href="img3.png" target="_blank"><img src="img3.png" alt="Altura máxima" style="max-width:100%;"></a>
+<em>Figura 0.</em></p>
+
+<p><a href="img4.png" target="_blank"><img src="img4.png" alt="Matriz" style="max-width:100%;"></a>
+<em>Figura 1.</em></p>
+
+<p>Após um bloco corrente ser posicionado, pode ocorrer de algumas linhas do tabuleiro ficarem totalmente preenchidas. Cada linha totalmente preenchida é removida do tabuleiro e o jogador ganha um ponto. O objetivo do jogador é preencher por completo linhas do tabuleiro, ganhando assim pontos.</p>
+
+<p>Neste laboratório iremos criar uma versão simplificada de Tetris, onde os únicos blocos possíveis são retângulos, como o da figura abaixo. Um retângulo possui largura e altura e, para fins de posicionamento, utilizaremos como ponto de referência o seu canto inferior esquerdo (como indicado pelo ponto preto na Figura 2). Este bloco é representado pela tupla <code>(l, a) = (4, 2)</code>, indicando a largura e altura do bloco respectivamente.</p>
+
+<p><a href="img1.png" target="_blank"><img src="img1.png" alt="Bloco" style="max-width:100%;"></a>
+<em>Figura 2.</em></p>
+
+<p>As regras do Tetris simplificado são as seguintes:</p>
+
+<ul>
+<li>O tabuleiro de Tetris possui altura e largura fixos, <code>10 x 10</code>;</li>
+<li>A cada instante um bloco cai do topo do tabuleiro, e um novo bloco só cairá após o bloco anterior estar posicionado e linhas preenchidas do tabuleiro serem removidas, se for o caso;</li>
+<li>Antes de um bloco cair, o jogador pode rotacionar o bloco em 90 graus, e o jogador também pode deslocar o bloco horizontalmente. Você pode assumir que, se aplicada a rotação, o bloco rotacionado permanece dentro dos limites do tabuleiro (horizontalmente);</li>
+<li>Após o jogador rotacionar e/ou deslocar o bloco horizontalmente, este cai e não pode  mais ser deslocado ou rotacionado;</li>
+<li>Após um bloco cair e encaixar em sua posição final, ele precisa estar totalmente contido dentro do limite do tabuleiro, caso contrário o jogo é encerrado pois o movimento foi inválido;</li>
+<li>Se após o posicionamento final de um bloco, uma linha do tabuleiro ficar totalmente preenchida, ela deve ser eliminada (as linhas acima devem descer) e o jogador ganha um ponto. Nesta versão de Tetris não é preciso considerar reações em cadeia, i.e., você deve simplesmente copiar as linhas acima daquela eliminada para a linha imediatamente abaixo dela (veja Figura 3 abaixo).</li>
+</ul>
+
+<p><a href="img2.png" target="_blank"><img src="img2.png" alt="Linha preenchida" style="max-width:100%;"></a>
+<em>Figura 3: Suponha que os blocos, vermelho, amarelo e verde caem em sequencia, ficando encaixados conforme aparecem na figura à esquerda. Em seguida cai o quadrado azul, ficando duas linhas (linhas 2 e 3) do tabuleiro inteiramente preenchidas. Estas linhas são removidas, e copia-se a linha 4 para o lugar da linha 2. Note que não são considerados eventos em cadeia, onde o bloco verde cairia para a linha 0. Portanto o tabuleiro final após o bloco azul cair é o apresentado na figura acima à direita.</em></p>
+
+<p>O objetivo deste laboratório é criar uma biblioteca de funções em C para simular um jogo de Tetris como descrito acima.</p>
+
+<p>Você deve implementar funções que realizam as seguintes operações:</p>
+
+<ul>
+<li><p><strong>Atualiza posição:</strong> Dada uma posição inicial do ponto de referência de um bloco que irá cair, a função atualiza a posição do bloco pelo deslocamento horizontal requisitado, se negativo desloca-se para a esquerda e se positivo desloca-se para a direita. O bloco deve sempre permanecer dentro dos limites horizontais do tabuleiro. Se por exemplo um bloco <code>(3,5)</code> for dado como entrada, inicialmente na posição <code>x=1</code> e for pedido um deslocamento <code>desl = -3</code>, espera-se mover o bloco 3 unidades para a esquerda. Neste caso, a posição do bloco será atualizada para <code>x=0</code> pois ele deve permanecer dentro do tabuleiro. Agora suponha que a posição inicial seja <code>x=5</code> e o deslocamento seja <code>desl = 6</code>. Neste caso, a posição final será atualizada para <code>x=7</code>, pois é possível mover o bloco apenas duas posições para a direta. Esta função também atualiza a rotação de um bloco. Caso seja indicado que deve ser feita a rotação, esta deverá ser feita primeiro, e só depois deverá ser considerado o deslocamento assumindo-se a nova largura e altura do bloco.</p></li>
+<li><p><strong>Encontra <code>y</code>:</strong> Dado que um bloco já foi rotacionado e deslocado pelo jogador, deve-se encontrar e retornar a altura final (coordenada <code>y</code>) do ponto de referência do bloco após este descer o máximo possível. Serão passados como parâmetros para a função, o tabuleiro, a posição final horizontal <code>x</code> do bloco, e sua largura. A função deverá retornar a altura final <code>y</code> do bloco considerando que ele desce o máximo possível. Lembre-se que as coordenadas finais <code>(x,y)</code> referem-se ao ponto de referência do bloco.</p></li>
+<li><p><strong>Verifica posição final:</strong> Dada a altura final <code>y</code> do bloco, após este cair o máximo possível, a função deve verificar se o bloco está inteiramente contido dentro do tabuleiro ou não.</p></li>
+<li><p><strong>Posiciona bloco:</strong> Dada uma posição final <code>(x,y)</code> válida para um bloco, esta função deve atualizar o tabuleiro para indicar que o bloco <code>(l,a)</code> está nesta posição.</p></li>
+<li><p><strong>Atualiza matriz:</strong> Esta função verifica o tabuleiro após o posicionamento de um bloco. A função deve verificar se há linhas totalmente preenchidas, e se for o caso, atualizar o tabuleiro removendo-as e retornar o número de linhas removidas, que será igual ao número de pontos ganhos pelo jogador.</p></li>
+</ul>
+
+<h2>
+<a id="user-content-funções" class="anchor" href="#fun%C3%A7%C3%B5es" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Funções</h2>
+
+<p>Observações gerais:</p>
+
+<ul>
+<li>Iremos considerar que o bloco começa a cair de fora do tabuleiro em uma posição <code>x</code> determinada, e desce o máximo possível em direção a altura 0.</li>
+<li>Para representar o estado do tabuleiro, iremos utilizar uma matriz <code>10 x 10</code>, de 0s e 1s, onde 0 significa que a posição não está preenchida (nenhum pedaço de bloco ocupa aquela posição), e 1 caso contrário.</li>
+</ul>
+
+<p>A descrição geral dos parâmetros de entrada e saída das funções estão descritos nos comentários dos protótipos das funções, que são fornecidos a seguir:</p>
+
+<p>Linguagem C:</p>
+
+<div class="highlight highlight-source-c"><pre><span class="pl-c">/* Desafio 2 - Tetris</span>
+<span class="pl-c"> * Nome:</span>
+<span class="pl-c"> * RA:</span>
+<span class="pl-c"> */</span>
+
+#<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">&lt;</span>stdio.h<span class="pl-pds">&gt;</span></span>
+
+#<span class="pl-k">define</span> <span class="pl-en">ALTURA_TABULEIRO</span> <span class="pl-c1">10</span>
+#<span class="pl-k">define</span> <span class="pl-en">LARGURA_TABULEIRO</span> <span class="pl-c1">10</span>
+
+<span class="pl-c">/* Funcao: atualiza_posicao</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Parametros:</span>
+<span class="pl-c"> *     *l: apontador para a largura do bloco que ira cair</span>
+<span class="pl-c"> *     *a: apontador para a altura do bloco que ira cair</span>
+<span class="pl-c"> *     *x: apontador para a posicao horizontal inicial do bloco que ira cair</span>
+<span class="pl-c"> *   desl: deslocamento horizontal a ser aplicado ao bloco (positivo para direita, negativo para a esquerda) </span>
+<span class="pl-c"> *    rot: 1 se deve rotacionar o bloco, 0 caso contrario </span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Retorno:</span>
+<span class="pl-c"> *   NULL</span>
+<span class="pl-c"> */</span>
+<span class="pl-k">void</span> <span class="pl-en">atualiza_posicao</span>(<span class="pl-k">int</span> *l, <span class="pl-k">int</span> *a, <span class="pl-k">int</span> *x, <span class="pl-k">int</span> desl, <span class="pl-k">int</span> rot) {
+    <span class="pl-c">/* Implementar a funcao */</span>
+}
+
+<span class="pl-c">/* Funcao: encontra_y</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Parametros:</span>
+<span class="pl-c"> *    mat: matriz representando o tabuleiro </span>
+<span class="pl-c"> *      l: largura do bloco que ira cair</span>
+<span class="pl-c"> *      x: posicao horizontal do bloco que ira cair</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Retorno:</span>
+<span class="pl-c"> *   altura final y do canto inferior esquerdo do bloco apos</span>
+<span class="pl-c"> *   este descer o maximo possivel</span>
+<span class="pl-c"> */</span>
+<span class="pl-k">int</span> <span class="pl-en">encontra_y</span>(<span class="pl-k">int</span> mat[ALTURA_TABULEIRO][LARGURA_TABULEIRO], <span class="pl-k">int</span> l, <span class="pl-k">int</span> x) {
+    <span class="pl-c">/* Implementar a funcao e trocar o valor de retorno */</span>
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}
+
+<span class="pl-c">/* Funcoes: posicao_final_valida</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Parametros:</span>
+<span class="pl-c"> *      a: altura do bloco que caiu</span>
+<span class="pl-c"> *      y: altura final do bloco que caiu</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Retorno:</span>
+<span class="pl-c"> *   1 se o bloco naquela posicao estiver contido dentro do tabuleiro, ou 0 caso contrario.</span>
+<span class="pl-c"> */</span>
+<span class="pl-k">int</span> <span class="pl-en">posicao_final_valida</span>(<span class="pl-k">int</span> a,  <span class="pl-k">int</span> y) {
+    <span class="pl-c">/* Implementar a funcao e trocar o valor de retorno */</span>
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}
+
+<span class="pl-c">/* Funcoes: posiciona_bloco</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Parametros:</span>
+<span class="pl-c"> *    mat: matriz do tabuleiro </span>
+<span class="pl-c"> *      l: largura do novo bloco</span>
+<span class="pl-c"> *      a: altura do novo bloco</span>
+<span class="pl-c"> *      x: posicao horizontal do novo bloco</span>
+<span class="pl-c"> *      y: altura final do novo bloco</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> *      Deve preencher com 1s as novas posições ocupadas pelo bloco que caiu</span>
+<span class="pl-c"> * Retorno:</span>
+<span class="pl-c"> *   NULL</span>
+<span class="pl-c"> */</span>
+<span class="pl-k">void</span> <span class="pl-en">posiciona_bloco</span>(<span class="pl-k">int</span> mat[ALTURA_TABULEIRO][LARGURA_TABULEIRO], <span class="pl-k">int</span> l, <span class="pl-k">int</span> a, <span class="pl-k">int</span> x, <span class="pl-k">int</span> y) {
+    <span class="pl-c">/* Implementar a funcao */</span>
+}
+
+<span class="pl-c">/* Funcoes: atualiza_matriz</span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> * Parametros:</span>
+<span class="pl-c"> *    mat: matriz do tabuleiro </span>
+<span class="pl-c"> *</span>
+<span class="pl-c"> *         Deve remover as linhas totalmente preenchidas do tabuleiro copiando</span>
+<span class="pl-c"> *         linhas posicionadas acima.</span>
+<span class="pl-c"> * Retorno:</span>
+<span class="pl-c"> *   retorna o numero de linhas totalmente preenchidas que foram removidas apos</span>
+<span class="pl-c"> *   a atualizacao do tabuleiro.</span>
+<span class="pl-c"> */</span>
+<span class="pl-k">int</span> <span class="pl-en">atualiza_matriz</span>(<span class="pl-k">int</span> mat[ALTURA_TABULEIRO][LARGURA_TABULEIRO]) {
+    <span class="pl-c">/* Implementar a funcao e trocar o valor de retorno */</span>
+    <span class="pl-k">return</span> <span class="pl-c1">0</span>;
+}
+</pre></div>
+
+
+
+
+
+
+    <h3>
+    <a id="user-content-múltiplos-arquivos-e-função-principal" class="anchor" href="#m%C3%BAltiplos-arquivos-e-fun%C3%A7%C3%A3o-principal" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Múltiplos Arquivos e Função Principal</h3>
+
+    <p>Neste laboratório vamos utilizar o conceito de dividir o
+    código em múltiplos arquivos. Quando se implementa programas
+    grandes é comum separar o código em vários arquivos com a
+    extensão .c, onde cada arquivo implementa um conjunto de
+    funções relacionadas entre si.  Isto facilita a manutenção e
+    a leitura do código. Para compilar um código organizado
+    dessa forma, basta passar todos os arquivos na linha de
+    comando para o compilador.</p>
+
+    <p>Para esse laboratório você só deverá implementar as funções descritas acima. A função principal (<strong>main</strong>) será fornecida em um arquivo separado, chamado <a href="aux/lab2_main.c"><code>lab2_main.c</code></a>.
+      <br>Um link para ele também está disponível na página da tarefa.</p>
+
+    <p>Vamos ao exemplo de como compilar o seu programa em C. Até agora, a forma que utilizamos (de forma simplificada) era a seguinte:</p>
+
+    <pre><code>gcc -o labX labX.c
+    </code></pre>
+
+    <p>Nesse laboratório, no entanto, para compilar o seu programa basta adicionar o arquivo extra que provemos (lab2_main.c) ao final da linha de comando, como no exemplo a seguir:</p>
+    <pre><code>gcc -o lab2 lab2.c lab2_main.c</code></pre>
+
+
+
+
+
+
+
+<h2>
+<a id="user-content-submissão" class="anchor" href="#submiss%C3%A3o" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Submissão</h2>
+
+<p>Neste laboratório você não precisará se preocupar em ler a
+entrada a partir da entrada padrão, nem em escrever a saída.
+Seu trabalho é apenas implementar as funções descritas. A
+função <code>main()</code> que é fornecida no arquivo <code>lab2_main.c</code> se encarrega dessa parte.</p>
+
+<p>Você também <strong>não deve</strong> submeter o arquivo <code>lab2_main.c</code>, somente o arquivo <code>lab2.c</code>.</p>
+<p>As seções abaixo, de <a href="#entrada">Entrada</a> e <a href="#sa%C3%ADda">Saída</a>,
+descrevem os formatos de entrada e saída, mas você
+não precisa se preocupar com eles.</p>
+
+
+<h2>
+<a id="user-content-entrada" class="anchor" href="#entrada" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Entrada</h2>
+
+<p>Uma vez que o tamanho do tabuleiro é fixo, a entrada é composta apenas dos blocos que deverão ser inseridos no tabuleiro. A primeira linha da entrada contém o número de blocos <code>n</code>. À seguir temos <code>n</code> linhas contendo cinco inteiros cada <code>l</code>, <code>a</code>, <code>x</code>, <code>desl</code> e <code>rot</code> descrevendo, respectivamente, a largura, a altura, a posição horizontal inicial, o deslocamento horizontal a ser aplicado, e se o bloco deverá ser rotacionado ou não, para cada um dos blocos. Em especial, o parâmetro <code>desl</code> será positivo se o deslocamento deve ser feito para a direita, e negativo para a esquerda. O parâmetro <code>rot</code> será 0 se bloco não deve ser rotacionado, e 1 caso contrário.  </p>
+
+<h2>
+<a id="user-content-saída" class="anchor" href="#sa%C3%ADda" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Saída</h2>
+
+<p>Na saída será impresso o estado do tabuleiro após a inserção de cada bloco válido no seguinte formato. A primeira linha conterá <code>bloco k</code>, onde <code>k</code> é o índice do bloco inserido (começando em 0), a próxima linha contém os pontos acumulados até aquele momento, e à seguir será impresso o próprio tabuleiro.</p>
+
+<h2>
+<a id="user-content-exemplos" class="anchor" href="#exemplos" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Exemplos</h2>
+
+<h6>
+<a id="user-content-teste-08" class="anchor" href="#teste-08" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Teste 08</h6>
+
+<ul>
+<li>
+<p><a href="dados/arq08.in">Entrada</a></p>
+
+<pre><code>13
+7 3 3 5 1
+7 4 1 -2 0
+8 3 1 -6 0
+7 4 0 4 1
+4 2 0 -9 0
+3 2 1 -7 0
+7 3 2 5 0
+9 3 1 5 0
+2 3 4 3 0
+3 3 2 4 1
+4 4 4 8 0
+2 1 4 0 1
+4 5 4 4 0
+</code></pre>
+</li>
+<li>
+<p><a href="dados/arq08.res">Saída</a></p>
+
+<pre><code>bloco 0
+0 pontos
+0000000000
+0000000000
+0000000000
+0000000111
+0000000111
+0000000111
+0000000111
+0000000111
+0000000111
+0000000111
+bloco 1
+4 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000111
+0000000111
+0000000111
+bloco 2
+4 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+1111111100
+1111111100
+1111111100
+0000000111
+0000000111
+0000000111
+</code></pre>
+</li>
+</ul>
+
+<h6>
+<a id="user-content-teste-09" class="anchor" href="#teste-09" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Teste 09</h6>
+
+<ul>
+<li>
+<p><a href="dados/arq09.in">Entrada</a></p>
+
+<pre><code>13
+8 3 0 -6 0
+2 4 4 5 0
+4 2 4 6 1
+8 4 0 -2 0
+6 5 3 -4 1
+8 1 2 2 1
+9 5 1 -7 0
+9 4 0 -9 0
+3 4 1 3 1
+5 5 1 4 1
+6 2 1 -7 0
+7 5 3 6 1
+4 3 2 7 1
+</code></pre>
+</li>
+<li>
+<p><a href="dados/arq09.res">Saída</a></p>
+
+<pre><code>bloco 0
+0 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+1111111100
+1111111100
+1111111100
+bloco 1
+3 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000011
+bloco 2
+3 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000011
+0000000011
+0000000011
+0000000011
+0000000011
+bloco 3
+7 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000011
+bloco 4
+7 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+1111100000
+1111100000
+1111100000
+1111100000
+1111100000
+1111100011
+</code></pre>
+</li>
+</ul>
+
+<h6>
+<a id="user-content-teste-10" class="anchor" href="#teste-10" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Teste 10</h6>
+
+<ul>
+<li>
+<p><a href="dados/arq10.in">Entrada</a></p>
+
+<pre><code>12
+4 5 2 -6 1
+5 5 2 7 0
+3 5 7 -7 0
+8 3 2 3 1
+5 5 2 2 0
+7 5 2 5 1
+4 5 0 7 1
+7 5 0 -4 0
+1 2 6 -9 0
+4 4 4 -8 0
+7 3 0 -3 0
+9 3 0 -4 1
+</code></pre>
+</li>
+<li>
+<p><a href="dados/arq10.res">Saída</a></p>
+
+<pre><code>bloco 0
+0 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+1111100000
+1111100000
+1111100000
+1111100000
+bloco 1
+4 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+0000011111
+bloco 2
+4 pontos
+0000000000
+0000000000
+0000000000
+0000000000
+0000000000
+1110000000
+1110000000
+1110000000
+1110000000
+1110011111
+bloco 3
+4 pontos
+0000000000
+0000011100
+0000011100
+0000011100
+0000011100
+1110011100
+1110011100
+1110011100
+1110011100
+1110011111
+</code></pre>
+</li>
+</ul>
+
+<h2>
+<a id="user-content-observações" class="anchor" href="#observa%C3%A7%C3%B5es" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Observações</h2>
+
+<ul>
+<li>Você <strong>não deve</strong> submeter o arquivo <code>lab2_main.c</code>, somente o arquivo <code>lab2.c</code>.</li>
+<li>Você deve incluir, no início do seu programa, uma breve descrição dos objetivos do programa, da entrada e da saída, além do seu nome e do seu RA.</li>
+<li>Indente corretamente o seu código e inclua comentários no decorrer do seu programa.</li>
+</ul>
+
+<h2>
+<a id="user-content-critérios-importantes" class="anchor" href="#crit%C3%A9rios-importantes" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Critérios importantes</h2>
+
+<p>O não
+cumprimento dos critérios abaixo implicará em nota zero
+nesta tarefa.</p>
+
+<ul>
+<li>Para os programas em linguagem C, o único header aceito para essa tarefa é o <code>stdio.h</code>.</li>
+</ul>
+
+    </article>
+</body>
+</html>
